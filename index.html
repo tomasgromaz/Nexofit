@@ -65,7 +65,12 @@ header.top .mark{height:26px;width:auto;flex:none;display:block}
 main{padding:14px 14px calc(108px + env(safe-area-inset-bottom));max-width:720px;margin:0 auto}
 nav.tabs{position:fixed;left:14px;right:14px;bottom:calc(10px + env(safe-area-inset-bottom));max-width:520px;margin:0 auto;z-index:20;background:var(--bar);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--bar-edge);border-radius:32px;display:flex;gap:2px;padding:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(255,255,255,.04),0 18px 44px -14px rgba(0,0,0,.55)}
 nav.tabs button{flex:1;position:relative;border:0;background:none;color:#A9AEB7;padding:9px 2px 7px;border-radius:26px;font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:background .25s,color .25s,box-shadow .25s,transform .15s}
-nav.tabs button.on{color:var(--accent);font-weight:600;background:linear-gradient(180deg,rgba(177,251,18,.26),rgba(177,251,18,.1));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 0 1px rgba(177,251,18,.32),0 0 22px -6px rgba(177,251,18,.55)}
+nav.tabs button.on{color:var(--accent);font-weight:600}
+nav.tabs{--w:calc((100% - 12px - (var(--n) - 1) * 2px) / var(--n));touch-action:none;-webkit-user-select:none;user-select:none}
+nav.tabs .lens{position:absolute;top:6px;bottom:6px;left:calc(6px + var(--i) * (var(--w) + 2px));width:var(--w);border-radius:26px;pointer-events:none;background:linear-gradient(180deg,rgba(177,251,18,.26),rgba(177,251,18,.1));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 0 1px rgba(177,251,18,.32),0 0 22px -6px rgba(177,251,18,.55);will-change:transform}
+nav.tabs.drag .lens{background:linear-gradient(180deg,rgba(177,251,18,.34),rgba(177,251,18,.16));box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 1px rgba(177,251,18,.45),0 0 28px -4px rgba(177,251,18,.7)}
+nav.tabs.drag button{color:#A9AEB7}
+nav.tabs.drag button.hot{color:var(--accent)}
 nav.tabs button:active{transform:scale(.94)}
 
 
@@ -308,10 +313,74 @@ async function reload() {
 /* ===== RENDER ===== */
 function render(keepScroll = true) {
   const y = window.scrollY;
+  const desde = lensLeft(), n0 = app.querySelectorAll('nav.tabs button').length;
   if (!S.user || !S.profile) app.innerHTML = authView();
   else app.innerHTML = shell();
   if (keepScroll) window.scrollTo(0, y);
+  slideLens(desde, n0);
 }
+
+/* ===== BARRA INFERIOR: la lente se desliza entre pestañas ===== */
+// La barra se vuelve a dibujar en cada cambio, así que se mide dónde estaba la lente
+// (aunque estuviera a mitad de camino) y se la anima desde ahí hasta su lugar nuevo.
+function lensLeft() { const l = app.querySelector('nav.tabs .lens'); return l ? l.getBoundingClientRect().left : null; }
+function slideLens(desde, cantidad) {
+  const nav = app.querySelector('nav.tabs'); if (!nav || desde == null) return;
+  const lens = nav.querySelector('.lens');
+  if (!lens || !lens.animate || nav.querySelectorAll('button').length !== cantidad) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const dx = desde - lens.getBoundingClientRect().left;
+  if (Math.abs(dx) < 1) return;
+  lens.animate(
+    [{ transform: `translateX(${dx}px) scale(1.1,1.06)` }, { transform: 'translateX(0) scale(1,1)' }],
+    { duration: 460, easing: 'cubic-bezier(.25,1.1,.4,1)' }
+  );
+}
+// Arrastrar la lente con el dedo: sigue el dedo y, al soltar, elige la pestaña más cercana.
+(function () {
+  let st = null, arrastro = false;
+  const tope = (s, v) => Math.max(0, Math.min(s.bs.length - 1, Math.round(v)));
+  document.addEventListener('pointerdown', e => {
+    if (e.button > 0) return;
+    const b = e.target.closest && e.target.closest('nav.tabs button.on'); if (!b) return;
+    const nav = b.parentNode, lens = nav.querySelector('.lens'), bs = [...nav.querySelectorAll('button')];
+    if (!lens || bs.length < 2) return;
+    st = { nav, lens, bs, cur: bs.indexOf(b), id: e.pointerId, x0: e.clientX, dx: 0, drag: false,
+      paso: bs[1].getBoundingClientRect().left - bs[0].getBoundingClientRect().left };
+  });
+  document.addEventListener('pointermove', e => {
+    if (!st || e.pointerId !== st.id) return;
+    const d = e.clientX - st.x0;
+    if (!st.drag) {
+      if (Math.abs(d) < 8) return;
+      st.drag = true; st.nav.classList.add('drag');
+      try { st.nav.setPointerCapture(st.id); } catch (_) {}
+    }
+    st.dx = Math.max(-st.cur * st.paso, Math.min((st.bs.length - 1 - st.cur) * st.paso, d));
+    st.lens.style.transition = 'none';
+    st.lens.style.transform = `translateX(${st.dx}px) scale(1.1,1.06)`;
+    const hot = tope(st, st.cur + st.dx / st.paso);
+    st.bs.forEach((b, i) => b.classList.toggle('hot', i === hot));
+  });
+  const soltar = e => {
+    if (!st || e.pointerId !== st.id) return;
+    const s = st; st = null;
+    if (!s.drag) return;
+    arrastro = true; setTimeout(() => { arrastro = false; }, 400);
+    s.nav.classList.remove('drag');
+    s.bs.forEach(b => b.classList.remove('hot'));
+    const idx = tope(s, s.cur + s.dx / s.paso);
+    if (e.type === 'pointerup' && idx !== s.cur) s.bs[idx].click();
+    else {
+      s.lens.style.transition = 'transform .38s cubic-bezier(.25,1.1,.4,1)';
+      s.lens.style.transform = '';
+    }
+  };
+  document.addEventListener('pointerup', soltar);
+  document.addEventListener('pointercancel', soltar);
+  // El toque que llega justo después de arrastrar no debe contar como un toque en una pestaña.
+  document.addEventListener('click', e => { if (arrastro && e.isTrusted) { e.stopPropagation(); e.preventDefault(); } }, true);
+})();
 function shell() {
   const tr = isTrainer();
   const tabs = tr
@@ -330,7 +399,7 @@ function shell() {
   }
   return `<header class="top">${S.nav.length ? '<button class="backb" data-act="back" aria-label="Volver">‹</button>' : ''}<h1>${esc(titles[v.name] || APP_NAME)}</h1><img class="mark" src="${IMG_MARK}" alt="${APP_NAME}"></header>
   <main>${body}</main>
-  <nav class="tabs">${tabs.map(([k, l, i]) => `<button class="${v.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${ic(i, 23)}${l}</button>`).join('')}</nav>`;
+  <nav class="tabs" style="--n:${tabs.length};--i:${Math.max(0, tabs.findIndex(t => t[0] === v.tab))}"><i class="lens" aria-hidden="true"></i>${tabs.map(([k, l, i]) => `<button class="${v.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${ic(i, 23)}${l}</button>`).join('')}</nav>`;
 }
 
 /* ===== AUTENTICACIÓN ===== */
