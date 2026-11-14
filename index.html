@@ -75,12 +75,9 @@ nav.tabs .lens{position:absolute;z-index:1;top:6px;bottom:6px;left:6px;width:var
 nav.tabs .lens::before{content:'';position:absolute;inset:0;border-radius:inherit;opacity:calc(1 - 1.4 * var(--p));background:linear-gradient(180deg,rgba(177,251,18,.2),rgba(177,251,18,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(177,251,18,.28)}
 /* lente inflada: vidrio que sobresale de la barra */
 nav.tabs .gl{position:absolute;inset:0;border-radius:inherit;opacity:0;will-change:transform,opacity;
-  background:radial-gradient(90% 52% at 50% -6%,rgba(255,255,255,.5),rgba(255,255,255,0) 72%),radial-gradient(85% 58% at 50% 112%,rgba(177,251,18,.46),rgba(177,251,18,0) 74%),linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 50%,rgba(255,255,255,.13));
-  -webkit-backdrop-filter:blur(2px) saturate(2.2) brightness(1.45) contrast(1.05);backdrop-filter:blur(2px) saturate(2.2) brightness(1.45) contrast(1.05);
-  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.85),inset 0 -1.5px 1px rgba(255,255,255,.4),inset 7px 0 12px -7px rgba(90,220,255,.75),inset -7px 0 12px -7px rgba(255,90,200,.7),inset 0 -12px 16px -9px rgba(177,251,18,.7),0 0 0 1px rgba(0,0,0,.28),0 12px 20px -7px rgba(0,0,0,.65),0 0 26px -2px rgba(177,251,18,.55)}
-nav.tabs .gl::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.3px;background:linear-gradient(140deg,rgba(255,255,255,1),rgba(255,255,255,.1) 30%,rgba(255,255,255,.05) 62%,rgba(255,255,255,.95)),conic-gradient(from 200deg,rgba(0,230,255,.6),rgba(255,0,170,.5),rgba(255,230,0,.5),rgba(0,230,255,.6));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
-nav.tabs .gl::after{content:'';position:absolute;left:11%;right:11%;top:2px;height:40%;border-radius:40px 40px 60% 60%/40px 40px 100% 100%;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.04));opacity:.55}
-nav.tabs .gl b{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(108deg,transparent 34%,rgba(255,255,255,.34) 46%,rgba(255,255,255,.08) 54%,transparent 62%);background-size:260% 100%;background-position:62% 0}
+  background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.06) 55%,rgba(177,251,18,.14));
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.34),inset 0 1px 0 rgba(255,255,255,.5),0 0 0 1px rgba(0,0,0,.28),0 12px 20px -7px rgba(0,0,0,.65),0 0 26px -2px rgba(177,251,18,.5)}
 /* mientras la lente se mueve: solo la pestaña que tiene debajo toma el color y se agranda */
 nav.tabs.live button{color:#A9AEB7}
 nav.tabs.live button.hot{color:var(--accent)}
@@ -177,11 +174,11 @@ details p{margin:4px 0 8px;font-size:15px}
 .loading{text-align:center;color:var(--muted);padding:50px 0}
 @media(prefers-reduced-motion:reduce){.bar i,#toast,.btn,.item,nav.tabs button,.backb,.seg button{transition:none}}
 /* sin desenfoque (navegadores viejos): el vidrio pasa a ser más opaco para que se lea igual */
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--bar:rgba(10,10,14,.96);--sheet:rgba(250,251,247,.97)}#toast{background:#0A0A0E}nav.tabs .gl{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}nav.tabs .gl::after,nav.tabs .gl b{display:none}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--bar:rgba(10,10,14,.96);--sheet:rgba(250,251,247,.97)}#toast{background:#0A0A0E}nav.tabs .gl{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}}
 @media(prefers-color-scheme:dark){@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--sheet:#181A20}}}
 /* si la persona pidió menos transparencia en su teléfono: todo sólido */
 @media(prefers-reduced-transparency:reduce){:root{--glass:var(--card);--glass-in:var(--bg);--glass-field:var(--bg);--sheet:var(--card);--bar:#0A0A0E;--sheen:transparent}
-  header.top,nav.tabs::before,nav.tabs .gl,.sheet,#toast,.play i{-webkit-backdrop-filter:none;backdrop-filter:none}body::before{display:none}nav.tabs .gl{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}nav.tabs .gl::after,nav.tabs .gl b{display:none}}
+  header.top,nav.tabs::before,nav.tabs .gl,.sheet,#toast,.play i{-webkit-backdrop-filter:none;backdrop-filter:none}body::before{display:none}nav.tabs .gl{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}}
 </style>
 </head>
 <body>
@@ -376,7 +373,6 @@ function lenteDibujar() {
   L.el.style.transform = `translate3d(${L.x.toFixed(2)}px,0,0)`;
   L.gl.style.transform = `scale(${(1 + (0.22 + e) * p).toFixed(3)},${(1 + (0.45 - e * 0.3) * p).toFixed(3)})`;
   L.gl.style.opacity = String(Math.max(0, Math.min(1, p * 1.5)));
-  L.gl.firstElementChild.style.backgroundPosition = Math.max(-20, Math.min(120, 62 - L.v / 35)).toFixed(1) + '% 0';   // el reflejo acompaña el movimiento
   L.nav.style.setProperty('--p', Math.max(0, Math.min(1.15, p)).toFixed(3));
   let hot = 0, dmin = 1e9;
   L.pos.forEach((q, i) => { const d = Math.abs(L.x - q); if (d < dmin) { dmin = d; hot = i; } L.bs[i].style.setProperty('--m', Math.max(0, 1 - d / (L.paso * 0.8)).toFixed(3)); });
@@ -458,7 +454,7 @@ function shell() {
   }
   return `<header class="top">${S.nav.length ? '<button class="backb" data-act="back" aria-label="Volver">‹</button>' : ''}<h1>${esc(titles[v.name] || APP_NAME)}</h1><img class="mark" src="${IMG_MARK}" alt="${APP_NAME}"></header>
   <main>${body}</main>
-  <nav class="tabs" data-tabs="${tabs.map(t => t[0]).join()}" style="--n:${tabs.length}"><i class="lens" aria-hidden="true"><u class="gl"><b></b></u></i>${tabs.map(([k, l, i]) => `<button class="${v.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${ic(i, 23)}${l}</button>`).join('')}</nav>`;
+  <nav class="tabs" data-tabs="${tabs.map(t => t[0]).join()}" style="--n:${tabs.length}"><i class="lens" aria-hidden="true"><u class="gl"></u></i>${tabs.map(([k, l, i]) => `<button class="${v.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${ic(i, 23)}${l}</button>`).join('')}</nav>`;
 }
 
 /* ===== AUTENTICACIÓN ===== */
