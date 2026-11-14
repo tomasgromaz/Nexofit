@@ -65,19 +65,25 @@ header.top .mark{height:26px;width:auto;flex:none;display:block}
 main{padding:14px 14px calc(108px + env(safe-area-inset-bottom));max-width:720px;margin:0 auto}
 nav.tabs{position:fixed;left:14px;right:14px;bottom:calc(10px + env(safe-area-inset-bottom));max-width:520px;margin:0 auto;z-index:20;border-radius:32px;display:flex;gap:2px;padding:6px}
 nav.tabs::before{content:'';position:absolute;inset:0;z-index:0;border-radius:inherit;pointer-events:none;background:var(--bar);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--bar-edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(255,255,255,.04),0 18px 44px -14px rgba(0,0,0,.55)}
-nav.tabs button{flex:1;position:relative;z-index:2;border:0;background:none;color:#A9AEB7;padding:9px 2px 7px;border-radius:26px;font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:background .25s,color .25s,box-shadow .25s,transform .15s}
+nav.tabs button{flex:1;position:relative;z-index:2;border:0;background:none;color:#A9AEB7;padding:9px 2px 7px;border-radius:26px;font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;scale:calc(1 + .12 * var(--m,0) * var(--p,0));transition:color .2s,transform .15s}
 nav.tabs button.on{color:var(--accent);font-weight:600}
-nav.tabs{--w:calc((100% - 12px - (var(--n) - 1) * 2px) / var(--n));touch-action:none;-webkit-user-select:none;user-select:none}
-nav.tabs .lens{position:absolute;z-index:1;top:-7px;bottom:-7px;left:calc(-1px + var(--i) * (var(--w) + 2px));width:calc(var(--w) + 14px);border-radius:48px;pointer-events:none;will-change:transform;
+nav.tabs{--w:calc((100% - 12px - (var(--n) - 1) * 2px) / var(--n));--p:0;touch-action:none;-webkit-user-select:none;user-select:none}
+/* la barra se ensancha y se vuelve más transparente mientras la lente está inflada (--p lo mueve el resorte) */
+nav.tabs::before{transform:scale(calc(1 + .035 * var(--p)),calc(1 + .09 * var(--p)));opacity:calc(1 - .28 * var(--p))}
+/* lente en reposo: píldora plana dentro de la barra */
+nav.tabs .lens{position:absolute;z-index:1;top:6px;bottom:6px;left:6px;width:var(--w);border-radius:26px;pointer-events:none;will-change:transform}
+nav.tabs .lens::before{content:'';position:absolute;inset:0;border-radius:inherit;opacity:calc(1 - 1.4 * var(--p));background:linear-gradient(180deg,rgba(177,251,18,.2),rgba(177,251,18,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(177,251,18,.28)}
+/* lente inflada: vidrio que sobresale de la barra */
+nav.tabs .gl{position:absolute;inset:0;border-radius:inherit;opacity:0;will-change:transform,opacity;
   background:radial-gradient(90% 52% at 50% -6%,rgba(255,255,255,.5),rgba(255,255,255,0) 72%),radial-gradient(85% 58% at 50% 112%,rgba(177,251,18,.46),rgba(177,251,18,0) 74%),linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 50%,rgba(255,255,255,.13));
   -webkit-backdrop-filter:blur(2px) saturate(2.2) brightness(1.45) contrast(1.05);backdrop-filter:blur(2px) saturate(2.2) brightness(1.45) contrast(1.05);
-  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.85),inset 0 -1.5px 1px rgba(255,255,255,.4),inset 8px 0 14px -8px rgba(90,220,255,.75),inset -8px 0 14px -8px rgba(255,90,200,.7),inset 0 -16px 22px -12px rgba(177,251,18,.7),0 0 0 1px rgba(0,0,0,.28),0 16px 28px -8px rgba(0,0,0,.7),0 0 36px -2px rgba(177,251,18,.55)}
-nav.tabs .lens::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.6px;background:linear-gradient(140deg,rgba(255,255,255,1),rgba(255,255,255,.1) 30%,rgba(255,255,255,.05) 62%,rgba(255,255,255,.95)),conic-gradient(from 200deg,rgba(0,230,255,.6),rgba(255,0,170,.5),rgba(255,230,0,.5),rgba(0,230,255,.6));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
-nav.tabs .lens::after{content:'';position:absolute;left:11%;right:11%;top:3px;height:40%;border-radius:40px 40px 60% 60%/40px 40px 100% 100%;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.04));opacity:.55}
-nav.tabs .lens b{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(108deg,transparent 34%,rgba(255,255,255,.34) 46%,rgba(255,255,255,.08) 54%,transparent 62%);background-size:260% 100%;background-position:62% 0}
-nav.tabs.drag .lens{-webkit-backdrop-filter:blur(2px) saturate(2.5) brightness(1.6) contrast(1.08);backdrop-filter:blur(2px) saturate(2.5) brightness(1.6) contrast(1.08);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -1.5px 1px rgba(255,255,255,.5),inset 8px 0 14px -8px rgba(90,220,255,.85),inset -8px 0 14px -8px rgba(255,90,200,.8),inset 0 -16px 22px -12px rgba(177,251,18,.8),0 0 0 1px rgba(0,0,0,.28),0 22px 34px -8px rgba(0,0,0,.75),0 0 46px 0 rgba(177,251,18,.75)}
-nav.tabs.drag button{color:#A9AEB7}
-nav.tabs.drag button.hot{color:var(--accent)}
+  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.85),inset 0 -1.5px 1px rgba(255,255,255,.4),inset 7px 0 12px -7px rgba(90,220,255,.75),inset -7px 0 12px -7px rgba(255,90,200,.7),inset 0 -12px 16px -9px rgba(177,251,18,.7),0 0 0 1px rgba(0,0,0,.28),0 12px 20px -7px rgba(0,0,0,.65),0 0 26px -2px rgba(177,251,18,.55)}
+nav.tabs .gl::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.3px;background:linear-gradient(140deg,rgba(255,255,255,1),rgba(255,255,255,.1) 30%,rgba(255,255,255,.05) 62%,rgba(255,255,255,.95)),conic-gradient(from 200deg,rgba(0,230,255,.6),rgba(255,0,170,.5),rgba(255,230,0,.5),rgba(0,230,255,.6));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+nav.tabs .gl::after{content:'';position:absolute;left:11%;right:11%;top:2px;height:40%;border-radius:40px 40px 60% 60%/40px 40px 100% 100%;background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.04));opacity:.55}
+nav.tabs .gl b{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(108deg,transparent 34%,rgba(255,255,255,.34) 46%,rgba(255,255,255,.08) 54%,transparent 62%);background-size:260% 100%;background-position:62% 0}
+/* mientras la lente se mueve: solo la pestaña que tiene debajo toma el color y se agranda */
+nav.tabs.live button{color:#A9AEB7}
+nav.tabs.live button.hot{color:var(--accent)}
 nav.tabs button:active{transform:scale(.94)}
 
 
@@ -171,11 +177,11 @@ details p{margin:4px 0 8px;font-size:15px}
 .loading{text-align:center;color:var(--muted);padding:50px 0}
 @media(prefers-reduced-motion:reduce){.bar i,#toast,.btn,.item,nav.tabs button,.backb,.seg button{transition:none}}
 /* sin desenfoque (navegadores viejos): el vidrio pasa a ser más opaco para que se lea igual */
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--bar:rgba(10,10,14,.96);--sheet:rgba(250,251,247,.97)}#toast{background:#0A0A0E}nav.tabs .lens{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}nav.tabs .lens::after,nav.tabs .lens b{display:none}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--bar:rgba(10,10,14,.96);--sheet:rgba(250,251,247,.97)}#toast{background:#0A0A0E}nav.tabs .gl{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}nav.tabs .gl::after,nav.tabs .gl b{display:none}}
 @media(prefers-color-scheme:dark){@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--sheet:#181A20}}}
 /* si la persona pidió menos transparencia en su teléfono: todo sólido */
 @media(prefers-reduced-transparency:reduce){:root{--glass:var(--card);--glass-in:var(--bg);--glass-field:var(--bg);--sheet:var(--card);--bar:#0A0A0E;--sheen:transparent}
-  header.top,nav.tabs::before,nav.tabs .lens,.sheet,#toast,.play i{-webkit-backdrop-filter:none;backdrop-filter:none}body::before{display:none}nav.tabs .lens{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}nav.tabs .lens::after,nav.tabs .lens b{display:none}}
+  header.top,nav.tabs::before,nav.tabs .gl,.sheet,#toast,.play i{-webkit-backdrop-filter:none;backdrop-filter:none}body::before{display:none}nav.tabs .gl{background:linear-gradient(180deg,rgba(177,251,18,.42),rgba(177,251,18,.2))}nav.tabs .gl::after,nav.tabs .gl b{display:none}}
 </style>
 </head>
 <body>
@@ -320,72 +326,114 @@ async function reload() {
 /* ===== RENDER ===== */
 function render(keepScroll = true) {
   const y = window.scrollY;
-  const desde = lensLeft(), n0 = app.querySelectorAll('nav.tabs button').length;
   if (!S.user || !S.profile) app.innerHTML = authView();
-  else app.innerHTML = shell();
+  else {
+    const tpl = document.createElement('template'); tpl.innerHTML = shell();
+    const nav0 = app.querySelector('nav.tabs'), nav1 = tpl.content.querySelector('nav.tabs');
+    const h0 = app.querySelector('header.top'), m0 = app.querySelector('main');
+    if (nav0 && nav1 && h0 && m0 && nav0.dataset.tabs === nav1.dataset.tabs) {
+      // La barra de abajo no se vuelve a dibujar: así la lente conserva su posición y su movimiento.
+      h0.replaceWith(tpl.content.querySelector('header.top'));
+      m0.replaceWith(tpl.content.querySelector('main'));
+      const b1 = nav1.querySelectorAll('button');
+      nav0.querySelectorAll('button').forEach((b, k) => b.classList.toggle('on', b1[k].classList.contains('on')));
+    } else app.innerHTML = tpl.innerHTML;
+  }
   if (keepScroll) window.scrollTo(0, y);
-  slideLens(desde, n0);
+  sincronizarLente();
 }
 
-/* ===== BARRA INFERIOR: la lente se desliza entre pestañas ===== */
-// La barra se vuelve a dibujar en cada cambio, así que se mide dónde estaba la lente
-// (aunque estuviera a mitad de camino) y se la anima desde ahí hasta su lugar nuevo.
-function lensLeft() { const l = app.querySelector('nav.tabs .lens'); return l ? l.getBoundingClientRect().left : null; }
-function slideLens(desde, cantidad) {
-  const nav = app.querySelector('nav.tabs'); if (!nav || desde == null) return;
-  const lens = nav.querySelector('.lens');
-  if (!lens || !lens.animate || nav.querySelectorAll('button').length !== cantidad) return;
-  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const dx = desde - lens.getBoundingClientRect().left;
-  if (Math.abs(dx) < 1) return;
-  lens.animate(
-    [{ transform: `translateX(${dx}px) scale(1.06,1.04)` }, { transform: 'translateX(0) scale(1,1)' }],
-    { duration: 460, easing: 'cubic-bezier(.25,1.1,.4,1)' }
-  );
-  const brillo = lens.firstElementChild;
-  if (brillo && brillo.animate) brillo.animate([{ backgroundPosition: dx > 0 ? '10% 0' : '112% 0' }, { backgroundPosition: '62% 0' }], { duration: 620, easing: 'ease-out' });
+/* ===== BARRA INFERIOR: lente de vidrio con física de resorte (como la de Apple Música) =====
+   En reposo es una píldora plana. Al tocar o arrastrar se infla y se vuelve vidrio que sobresale de la
+   barra, viaja con un resorte (arranca suave, acelera, frena con un pequeño rebote y se estira con la
+   velocidad) y al llegar se desinfla. Las pestañas que pasan por debajo se agrandan y toman el color. */
+const LENTE = { nav: null, el: null, gl: null, bs: [], pos: [], paso: 1, x: 0, v: 0, tx: 0, p: 0, pv: 0, quieto: 0, t: 0, raf: 0, apretado: false, arrastrando: false, hot: -1 };
+const sinMovimiento = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+function lenteMedir() {
+  const L = LENTE; if (!L.nav) return;
+  L.bs = [...L.nav.querySelectorAll('button')];
+  L.pos = L.bs.map(b => b.offsetLeft - L.bs[0].offsetLeft);
+  L.paso = L.bs.length > 1 ? L.pos[1] - L.pos[0] : 1;
 }
-// Arrastrar la lente con el dedo: sigue el dedo y, al soltar, elige la pestaña más cercana.
+const lenteTab = () => LENTE.bs.findIndex(b => b.classList.contains('on'));
+function sincronizarLente() {
+  const L = LENTE, nav = app.querySelector('nav.tabs');
+  if (!nav) { cancelAnimationFrame(L.raf); L.raf = 0; L.nav = null; return; }
+  if (nav !== L.nav) {                       // barra nueva: arranca ya en su lugar
+    cancelAnimationFrame(L.raf); L.raf = 0;
+    Object.assign(L, { nav, el: nav.querySelector('.lens'), gl: nav.querySelector('.gl'), p: 0, pv: 0, v: 0, quieto: 1, apretado: false, arrastrando: false, hot: -1 });
+    lenteMedir(); L.x = L.tx = L.pos[Math.max(0, lenteTab())] || 0; lenteDibujar(); return;
+  }
+  lenteMedir();
+  const i = lenteTab(); if (i < 0 || L.arrastrando) return;
+  L.tx = L.pos[i];
+  if (sinMovimiento() || Math.abs(L.x - L.tx) < 0.5) { L.x = L.tx; L.v = 0; lenteDibujar(); return; }   // sin cambio de pestaña: no hay nada que animar
+  lenteCorrer();
+}
+function lenteDibujar() {
+  const L = LENTE; if (!L.el) return;
+  const e = Math.min(Math.abs(L.v) / 2600, 0.38), p = L.p;       // se estira según la velocidad
+  L.el.style.transform = `translate3d(${L.x.toFixed(2)}px,0,0)`;
+  L.gl.style.transform = `scale(${(1 + (0.22 + e) * p).toFixed(3)},${(1 + (0.45 - e * 0.3) * p).toFixed(3)})`;
+  L.gl.style.opacity = String(Math.max(0, Math.min(1, p * 1.5)));
+  L.gl.firstElementChild.style.backgroundPosition = Math.max(-20, Math.min(120, 62 - L.v / 35)).toFixed(1) + '% 0';   // el reflejo acompaña el movimiento
+  L.nav.style.setProperty('--p', Math.max(0, Math.min(1.15, p)).toFixed(3));
+  let hot = 0, dmin = 1e9;
+  L.pos.forEach((q, i) => { const d = Math.abs(L.x - q); if (d < dmin) { dmin = d; hot = i; } L.bs[i].style.setProperty('--m', Math.max(0, 1 - d / (L.paso * 0.8)).toFixed(3)); });
+  L.nav.classList.toggle('live', p > 0.03);
+  if (hot !== L.hot) { L.hot = hot; L.bs.forEach((b, i) => b.classList.toggle('hot', i === hot)); }
+}
+function lenteCorrer() {
+  const L = LENTE; if (L.raf || !L.nav) return;
+  L.t = performance.now();
+  const paso = t => {
+    const dt = Math.min(0.033, Math.max(0.001, (t - L.t) / 1000)); L.t = t;
+    const k = L.arrastrando ? 620 : 300, c = L.arrastrando ? 44 : 25;            // resorte de la posición
+    for (let s = 0; s < 2; s++) { L.v += (-k * (L.x - L.tx) - c * L.v) * dt / 2; L.x += L.v * dt / 2; }
+    const movil = Math.abs(L.x - L.tx) > 2.5 || Math.abs(L.v) > 70;
+    L.quieto = movil ? 0 : L.quieto + dt;
+    const inflar = (L.apretado || L.arrastrando || movil || L.quieto < 0.09) ? 1 : 0;   // se desinfla un instante después de llegar
+    for (let s = 0; s < 2; s++) { L.pv += (-380 * (L.p - inflar) - (inflar ? 22 : 32) * L.pv) * dt / 2; L.p += L.pv * dt / 2; }
+    lenteDibujar();
+    if (!movil && !inflar && Math.abs(L.p) < 0.01 && Math.abs(L.pv) < 0.05) {
+      L.x = L.tx; L.v = 0; L.p = 0; L.pv = 0; lenteDibujar(); L.raf = 0; return;
+    }
+    L.raf = requestAnimationFrame(paso);
+  };
+  L.raf = requestAnimationFrame(paso);
+}
+window.addEventListener('resize', () => { const L = LENTE; if (!L.nav) return; lenteMedir(); const i = lenteTab(); if (i >= 0) { L.x = L.tx = L.pos[i]; L.v = 0; lenteDibujar(); } });
+// Tocar inflama la lente; arrastrarla con el dedo la mueve, y al soltar elige la pestaña más cercana.
 (function () {
   let st = null, arrastro = false;
-  const tope = (s, v) => Math.max(0, Math.min(s.bs.length - 1, Math.round(v)));
   document.addEventListener('pointerdown', e => {
-    if (e.button > 0) return;
-    const b = e.target.closest && e.target.closest('nav.tabs button.on'); if (!b) return;
-    const nav = b.parentNode, lens = nav.querySelector('.lens'), bs = [...nav.querySelectorAll('button')];
-    if (!lens || bs.length < 2) return;
-    st = { nav, lens, bs, cur: bs.indexOf(b), id: e.pointerId, x0: e.clientX, dx: 0, drag: false,
-      paso: bs[1].getBoundingClientRect().left - bs[0].getBoundingClientRect().left };
+    if (e.button > 0 || sinMovimiento() || !LENTE.nav) return;
+    const b = e.target.closest && e.target.closest('nav.tabs button'); if (!b) return;
+    LENTE.apretado = true; lenteCorrer();
+    st = { id: e.pointerId, x0: e.clientX, cur: lenteTab(), drag: false, enLente: b.classList.contains('on') };
   });
   document.addEventListener('pointermove', e => {
-    if (!st || e.pointerId !== st.id) return;
+    if (!st || e.pointerId !== st.id || !st.enLente) return;
     const d = e.clientX - st.x0;
     if (!st.drag) {
       if (Math.abs(d) < 8) return;
-      st.drag = true; st.nav.classList.add('drag');
-      try { st.nav.setPointerCapture(st.id); } catch (_) {}
+      st.drag = true; LENTE.arrastrando = true;
+      try { LENTE.nav.setPointerCapture(st.id); } catch (_) {}
     }
-    st.dx = Math.max(-st.cur * st.paso, Math.min((st.bs.length - 1 - st.cur) * st.paso, d));
-    st.lens.style.transition = 'none';
-    st.lens.style.transform = `translateX(${st.dx}px) scale(1.06,1.04)`;
-    if (st.lens.firstElementChild) st.lens.firstElementChild.style.backgroundPosition = (62 - st.dx / st.paso * 40) + '% 0';
-    const hot = tope(st, st.cur + st.dx / st.paso);
-    st.bs.forEach((b, i) => b.classList.toggle('hot', i === hot));
+    LENTE.tx = Math.max(0, Math.min(LENTE.pos[LENTE.pos.length - 1], LENTE.pos[st.cur] + d));
+    lenteCorrer();
   });
   const soltar = e => {
     if (!st || e.pointerId !== st.id) return;
     const s = st; st = null;
-    if (!s.drag) return;
+    LENTE.apretado = false;
+    if (!s.drag) { lenteCorrer(); return; }                       // toque simple: del cambio se ocupa el click
     arrastro = true; setTimeout(() => { arrastro = false; }, 400);
-    s.nav.classList.remove('drag');
-    s.bs.forEach(b => b.classList.remove('hot'));
-    const idx = tope(s, s.cur + s.dx / s.paso);
-    if (e.type === 'pointerup' && idx !== s.cur) s.bs[idx].click();
-    else {
-      s.lens.style.transition = 'transform .38s cubic-bezier(.25,1.1,.4,1)';
-      s.lens.style.transform = '';
-      if (s.lens.firstElementChild) s.lens.firstElementChild.style.backgroundPosition = '';
-    }
+    LENTE.arrastrando = false;
+    let idx = 0; LENTE.pos.forEach((q, i) => { if (Math.abs(q - LENTE.tx) < Math.abs(LENTE.pos[idx] - LENTE.tx)) idx = i; });
+    if (e.type === 'pointerup' && idx !== s.cur) { LENTE.tx = LENTE.pos[idx]; LENTE.bs[idx].click(); }
+    else LENTE.tx = LENTE.pos[s.cur];
+    lenteCorrer();
   };
   document.addEventListener('pointerup', soltar);
   document.addEventListener('pointercancel', soltar);
@@ -410,7 +458,7 @@ function shell() {
   }
   return `<header class="top">${S.nav.length ? '<button class="backb" data-act="back" aria-label="Volver">‹</button>' : ''}<h1>${esc(titles[v.name] || APP_NAME)}</h1><img class="mark" src="${IMG_MARK}" alt="${APP_NAME}"></header>
   <main>${body}</main>
-  <nav class="tabs" style="--n:${tabs.length};--i:${Math.max(0, tabs.findIndex(t => t[0] === v.tab))}"><i class="lens" aria-hidden="true"><b></b></i>${tabs.map(([k, l, i]) => `<button class="${v.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${ic(i, 23)}${l}</button>`).join('')}</nav>`;
+  <nav class="tabs" data-tabs="${tabs.map(t => t[0]).join()}" style="--n:${tabs.length}"><i class="lens" aria-hidden="true"><u class="gl"><b></b></u></i>${tabs.map(([k, l, i]) => `<button class="${v.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}">${ic(i, 23)}${l}</button>`).join('')}</nav>`;
 }
 
 /* ===== AUTENTICACIÓN ===== */
